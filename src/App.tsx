@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Browse from './pages/Browse'
 import CityDetails from './pages/CityDetail'
-import Details from './pages/Details'
+import Details from './pages/OfficeDetail'
 import BookOffice from './pages/BookOffice'
 import SuccessBooking from './pages/SuccessBooking'
 import CheckBooking from './pages/CheckBooking'
