@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import OfficeCard from "../components/OfficeCard";
 import { Office } from "../types/type";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default function OfficeWrapper() {
   const [offices, setOffices] = useState<Office[]>([]);
@@ -23,7 +24,7 @@ export default function OfficeWrapper() {
         setError(error);
         setLoading(false);
       });
-  },[]);
+  }, []);
 
   if (loading) {
     return <p>Loading...</p>;
@@ -45,7 +46,9 @@ export default function OfficeWrapper() {
         </h2>
         <div className="grid grid-cols-3 gap-[30px]">
           {offices.map((office) => (
-            <OfficeCard key={office.id} office={office}></OfficeCard>
+            <Link to={`/office/${office.slug}`} key={office.id}>
+              <OfficeCard office={office}></OfficeCard>
+            </Link>
           ))}
         </div>
       </section>
