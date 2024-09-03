@@ -23,7 +23,7 @@ export default function OfficeWrapper() {
         setError(error);
         setLoading(false);
       });
-  });
+  },[]);
 
   if (loading) {
     return <p>Loading...</p>;
