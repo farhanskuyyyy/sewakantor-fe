@@ -6,7 +6,7 @@ export const BookingSchema = z.object({
   started_at: z
     .string()
     .refine((date) => !isNaN(Date.parse(date)), "Invalid date"),
-  office_space_id: z.string().min(1, "Office Space ID is Required"),
+  office_space_id: z.number().min(1, "Office Space ID is Required"),
 });
 
 export const viewBookingSchema = z.object({

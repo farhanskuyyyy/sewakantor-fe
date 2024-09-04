@@ -110,7 +110,7 @@ export default function BookOffice() {
       navigate("/success-booking", {
         state: {
           office,
-          booking: response.data,
+          booking: response.data.data,
         },
       });
     } catch (error: unknown) {
@@ -143,7 +143,6 @@ export default function BookOffice() {
       </div>
       <form
         onSubmit={handleSubmit}
-        action="booking-finished.html"
         className="relative flex justify-center max-w-[1130px] mx-auto gap-[30px] mb-20 z-20"
       >
         <div className="flex flex-col shrink-0 w-[500px] h-fit rounded-[20px] border border-[#E0DEF7] p-[30px] gap-[30px] bg-white">
