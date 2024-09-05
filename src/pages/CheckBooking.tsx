@@ -4,6 +4,7 @@ import { BookingDetails } from "../types/type";
 import { z } from "zod";
 import axios from "axios";
 import { viewBookingSchema } from "../types/validationBooking";
+import apiClient, { isAxiosError } from "../services/apiService";
 
 export default function CheckBooking() {
   const [formData, setFormData] = useState({
@@ -17,7 +18,6 @@ export default function CheckBooking() {
     null
   );
   const [error, setError] = useState<string | null>(null);
-  const baseURL = "http://127.0.0.1:8000/storage";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -39,22 +39,13 @@ export default function CheckBooking() {
     console.log("Form data is valid. Submitting...", formData);
     setIsLoading(true); // Set loading state to true
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/check-booking",
-        {
-          ...formData,
-        },
-        {
-          // The rest of the fields are handled by the backend
-          headers: {
-            "X-API-KEY": "jalksdasmkldjalksdjaslkdj12312321",
-          },
-        }
-      );
+      const response = await apiClient.post("/check-booking", {
+        ...formData,
+      });
 
       setBookingDetails(response.data.data);
     } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         setError(error.message);
       } else {
         setError("An unexpected error occurred");
@@ -239,7 +230,6 @@ export default function CheckBooking() {
             <div className="flex flex-col h-fit shrink-0 rounded-[20px] border border-[#E0DEF7] p-[30px] gap-[30px] bg-white">
               <h2 className="font-bold">Order Details</h2>
               <div className="flex flex-col gap-5">
-                
                 {bookingDetails.is_paid ? (
                   <div className="flex items-center justify-between">
                     <p className="font-semibold">Status Pembayaran</p>

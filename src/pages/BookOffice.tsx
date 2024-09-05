@@ -5,6 +5,7 @@ import { Office } from "../types/type";
 import axios from "axios";
 import { z } from "zod";
 import { BookingSchema } from "../types/validationBooking";
+import apiClient, { isAxiosError } from "../services/apiService";
 
 export default function BookOffice() {
   const { slug } = useParams<{ slug: string }>();
@@ -94,18 +95,9 @@ export default function BookOffice() {
     console.log("Form data is valid. Submitting...", formData);
     setIsLoading(true); // Set loading state to true
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/booking-transaction",
-        {
-          ...formData,
-        },
-        {
-          // The rest of the fields are handled by the backend
-          headers: {
-            "X-API-KEY": "jalksdasmkldjalksdjaslkdj12312321",
-          },
-        }
-      );
+      const response = await apiClient.post("/booking-transaction", {
+        ...formData,
+      });
       console.log("Form submitted successfully:", response.data);
       navigate("/success-booking", {
         state: {
@@ -114,7 +106,7 @@ export default function BookOffice() {
         },
       });
     } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
+      if (isAxiosError(error)) {
         setError(error.message);
       } else {
         setError("An unexpected error occurred");
