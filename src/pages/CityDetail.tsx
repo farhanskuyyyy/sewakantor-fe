@@ -4,6 +4,8 @@ import { City } from "../types/type";
 import OfficeCard from "../components/OfficeCard";
 import Navbar from "../components/Navbar";
 import apiClient from "../services/apiService";
+import Loading from "../components/Loading";
+import ErrorNotFound from "./ErrorNotFound";
 
 export default function CityDetails() {
   const { slug } = useParams<{ slug: string }>();
@@ -20,21 +22,30 @@ export default function CityDetails() {
         setLoading(false);
       })
       .catch((error) => {
-        setError(error);
+        setError(error.message);
         setLoading(false);
       });
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <>
+        <Navbar />
+        <Loading />;
+      </>
+    );
   }
 
   if (error) {
-    return <p>Error loading Data : {error}</p>;
+    if (error == 'Request failed with status code 404') {
+      return <ErrorNotFound/>;
+    }else{
+      return <p>Error loading Data : {error}</p>;
+    }
   }
 
   if (!city) {
-    return <p>Category Not Found</p>;
+    return <ErrorNotFound/>;
   }
 
   return (

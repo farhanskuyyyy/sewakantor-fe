@@ -12,16 +12,13 @@ export default function Navbar() {
             <Link to="/">Browse</Link>
           </li>
           <li>
-            <Link to="/office">Popular</Link>
+            <Link to="/offices">Offices</Link>
           </li>
           <li>
-            <Link to="city">Categories</Link>
+            <Link to="/cities">Cities</Link>
           </li>
           <li>
-            <Link to="/">Events</Link>
-          </li>
-          <li>
-            <Link to="/">My Booking</Link>
+            <Link to="/check-booking">My Booking</Link>
           </li>
         </ul>
         <a

@@ -122,7 +122,21 @@ export default function Browse() {
           </div>
         </div>
       </header>
-      <CityWrapper />
+      <section id="Cities" className="flex flex-col gap-[30px] mt-[100px]">
+        <div className="w-full max-w-[1130px] mx-auto flex items-center justify-between">
+          <h2 className="font-bold text-[32px] leading-[48px] text-nowrap">
+            You Can Choose <br />
+            Our Favorite Cities
+          </h2>
+          <a
+            href="/cities"
+            className="rounded-full rounded-full py-3 px-5 bg-white font-bold"
+          >
+            Explore All City
+          </a>
+        </div>
+        <CityWrapper />
+      </section>
       <section
         id="Benefits"
         className="flex items-center justify-center w-[1015px] mx-auto gap-[100px] mt-[100px]"

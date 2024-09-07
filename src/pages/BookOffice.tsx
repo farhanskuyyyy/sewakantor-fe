@@ -6,6 +6,8 @@ import axios from "axios";
 import { z } from "zod";
 import { BookingSchema } from "../types/validationBooking";
 import apiClient, { isAxiosError } from "../services/apiService";
+import ErrorNotFound from "./ErrorNotFound";
+import Loading from "../components/Loading";
 
 export default function BookOffice() {
   const { slug } = useParams<{ slug: string }>();
@@ -64,15 +66,24 @@ export default function BookOffice() {
   }, [slug]);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <>
+        <Navbar />
+        <Loading />;
+      </>
+    );
   }
 
   if (error) {
-    return <p>Error loading Data : {error}</p>;
+    if (error == 'Request failed with status code 404') {
+      return <ErrorNotFound/>;
+    }else{
+      return <p>Error loading Data : {error}</p>;
+    };
   }
 
   if (!office) {
-    return <p>Category Not Found</p>;
+    return <ErrorNotFound/>;
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

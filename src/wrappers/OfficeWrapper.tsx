@@ -3,6 +3,7 @@ import OfficeCard from "../components/OfficeCard";
 import { Office } from "../types/type";
 import { Link } from "react-router-dom";
 import apiClient from "../services/apiService";
+import Loading from "../components/Loading";
 
 export default function OfficeWrapper() {
   const [offices, setOffices] = useState<Office[]>([]);
@@ -22,13 +23,10 @@ export default function OfficeWrapper() {
       });
   }, []);
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
   if (error) {
     return <p>Error loading Data : {error}</p>;
   }
+  
   return (
     <>
       <section
@@ -40,13 +38,17 @@ export default function OfficeWrapper() {
           <br />
           For Your Better Productivity.
         </h2>
-        <div className="grid grid-cols-3 gap-[30px]">
-          {offices.map((office) => (
-            <Link to={`/office/${office.slug}`} key={office.id}>
-              <OfficeCard office={office}></OfficeCard>
-            </Link>
-          ))}
-        </div>
+        {offices.length > 0 ? (
+          <div className="grid grid-cols-3 gap-[30px]">
+            {offices.map((office) => (
+              <Link to={`/office/${office.slug}`} key={office.id}>
+                <OfficeCard office={office}></OfficeCard>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <Loading />
+        )}
       </section>
     </>
   );

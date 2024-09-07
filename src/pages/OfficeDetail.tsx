@@ -4,6 +4,8 @@ import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Office } from "../types/type";
 import apiClient from "../services/apiService";
+import ErrorNotFound from "./ErrorNotFound";
+import Loading from "../components/Loading";
 
 export default function OfficeDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -20,21 +22,30 @@ export default function OfficeDetail() {
         setLoading(false);
       })
       .catch((error) => {
-        setError(error);
+        setError(error.message);
         setLoading(false);
       });
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <>
+        <Navbar />
+        <Loading />;
+      </>
+    );
   }
 
   if (error) {
-    return <p>Error loading Data : {error}</p>;
+    if (error == 'Request failed with status code 404') {
+      return <ErrorNotFound/>;
+    }else{
+      return <p>Error loading Data : {error}</p>;
+    };
   }
 
   if (!office) {
-    return <p>Category Not Found</p>;
+    return <ErrorNotFound/>;
   }
   return (
     <>
@@ -238,7 +249,7 @@ export default function OfficeDetail() {
             <hr className="border-[#F6F5FD]" />
             <div className="flex flex-col gap-5">
               {office.benefits.map((benefit) => (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3" key={benefit.id}>
                   <img
                     src="/assets/images/icons/verify.svg"
                     className="w-[30px] h-[30px]"

@@ -5,6 +5,7 @@ import { z } from "zod";
 import axios from "axios";
 import { viewBookingSchema } from "../types/validationBooking";
 import apiClient, { isAxiosError } from "../services/apiService";
+import Loading from "../components/Loading";
 
 export default function CheckBooking() {
   const [formData, setFormData] = useState({
@@ -28,16 +29,15 @@ export default function CheckBooking() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Validating form data...");
     const validation = viewBookingSchema.safeParse(formData);
     if (!validation.success) {
-      console.error("Validation errors:", validation.error.issues);
       setFormErrors(validation.error.issues);
       return;
     }
 
-    console.log("Form data is valid. Submitting...", formData);
+    setError(null); // Set loading state to true
     setIsLoading(true); // Set loading state to true
+    setBookingDetails(null);
     try {
       const response = await apiClient.post("/check-booking", {
         ...formData,
@@ -138,173 +138,205 @@ export default function CheckBooking() {
             </span>
           </button>
         </form>
-        {bookingDetails && (
-          <div id="Result" className="grid grid-cols-2 gap-[30px]">
-            <div className="flex flex-col h-fit shrink-0 rounded-[20px] border border-[#E0DEF7] p-[30px] gap-[30px] bg-white">
-              <div className="flex items-center gap-4">
-                <div className="flex shrink-0 w-[140px] h-[100px] rounded-[20px] overflow-hidden">
-                  <img
-                    src="assets/images/thumbnails/thumbnail-details-4.png"
-                    className="w-full h-full object-cover"
-                    alt="thumbnail"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <p className="font-bold text-xl leading-[30px]">
-                    {bookingDetails.office.name}
-                  </p>
-                  <div className="flex items-center gap-[6px]">
-                    <img
-                      src="assets/images/icons/location.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <p className="font-semibold">
-                      {bookingDetails.office.city.name}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <hr className="border-[#F6F5FD]" />
-              <div className="flex flex-col gap-4">
-                <h2 className="font-bold">Customer Details</h2>
-                <div className="flex flex-col gap-2">
-                  <h3 className="font-semibold">Full Name</h3>
-                  <div className="flex items-center rounded-full px-5 py-3 gap-[10px] bg-[#F7F7FD]">
-                    <img
-                      src="assets/images/icons/security-user-black.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <p className="font-semibold">{bookingDetails.name}</p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <h3 className="font-semibold">Phone Number</h3>
-                  <div className="flex items-center rounded-full px-5 py-3 gap-[10px] bg-[#F7F7FD]">
-                    <img
-                      src="assets/images/icons/call-black.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <p className="font-semibold">
-                      {bookingDetails.phone_number}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <h3 className="font-semibold">Started At</h3>
-                  <div className="flex items-center rounded-full px-5 py-3 gap-[10px] bg-[#F7F7FD]">
-                    <img
-                      src="assets/images/icons/calendar-black.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <p className="font-semibold">{bookingDetails.started_at}</p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <h3 className="font-semibold">Ended At</h3>
-                  <div className="flex items-center rounded-full px-5 py-3 gap-[10px] bg-[#F7F7FD]">
-                    <img
-                      src="assets/images/icons/calendar-black.svg"
-                      className="w-6 h-6"
-                      alt="icon"
-                    />
-                    <p className="font-semibold">{bookingDetails.ended_at}</p>
-                  </div>
-                </div>
-              </div>
-              <hr className="border-[#F6F5FD]" />
-              <div className="flex items-center gap-3">
+        <ResultBooking
+          bookingDetails={bookingDetails}
+          isLoading={isLoading}
+          error={error}
+        />
+      </section>
+    </>
+  );
+}
+
+interface ResultProps {
+  bookingDetails: BookingDetails | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const ResultBooking: React.FC<ResultProps> = ({
+  bookingDetails = null,
+  isLoading,
+  error = null,
+}) => {
+  if (bookingDetails) {
+    return (
+      <div id="Result" className="grid grid-cols-2 gap-[30px]">
+        <div className="flex flex-col h-fit shrink-0 rounded-[20px] border border-[#E0DEF7] p-[30px] gap-[30px] bg-white">
+          <div className="flex items-center gap-4">
+            <div className="flex shrink-0 w-[140px] h-[100px] rounded-[20px] overflow-hidden">
+              <img
+                src="assets/images/thumbnails/thumbnail-details-4.png"
+                className="w-full h-full object-cover"
+                alt="thumbnail"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <p className="font-bold text-xl leading-[30px]">
+                {bookingDetails.office.name}
+              </p>
+              <div className="flex items-center gap-[6px]">
                 <img
-                  src="assets/images/icons/shield-tick.svg"
-                  className="w-[30px] h-[30px]"
+                  src="assets/images/icons/location.svg"
+                  className="w-6 h-6"
                   alt="icon"
                 />
-                <p className="font-semibold leading-[28px]">
-                  Privasi Anda aman bersama kami.
+                <p className="font-semibold">
+                  {bookingDetails.office.city.name}
                 </p>
               </div>
             </div>
-            <div className="flex flex-col h-fit shrink-0 rounded-[20px] border border-[#E0DEF7] p-[30px] gap-[30px] bg-white">
-              <h2 className="font-bold">Order Details</h2>
-              <div className="flex flex-col gap-5">
-                {bookingDetails.is_paid ? (
-                  <div className="flex items-center justify-between">
-                    <p className="font-semibold">Status Pembayaran</p>
-                    <p className="rounded-full w-fit p-[6px_16px] bg-[#0D903A] font-bold text-sm leading-[21px] text-[#F7F7FD]">
-                      SUCCESS
-                    </p>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between">
-                    <p className="font-semibold">Status Pembayaran</p>
-                    <p className="rounded-full w-fit p-[6px_16px] bg-[#FF852D] font-bold text-sm leading-[21px] text-[#F7F7FD]">
-                      PENDING
-                    </p>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold">Booking TRX ID</p>
-                  <p className="font-bold">{bookingDetails.booking_trx_id}</p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold">Duration</p>
-                  <p className="font-bold">
-                    {bookingDetails.duration} Days Working
-                  </p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold">Total Amount</p>
-                  <p className="font-bold text-[22px] leading-[33px] text-[#0D903A]">
-                    Rp {bookingDetails.total_amount.toLocaleString("id")}
-                  </p>
-                </div>
+          </div>
+          <hr className="border-[#F6F5FD]" />
+          <div className="flex flex-col gap-4">
+            <h2 className="font-bold">Customer Details</h2>
+            <div className="flex flex-col gap-2">
+              <h3 className="font-semibold">Full Name</h3>
+              <div className="flex items-center rounded-full px-5 py-3 gap-[10px] bg-[#F7F7FD]">
+                <img
+                  src="assets/images/icons/security-user-black.svg"
+                  className="w-6 h-6"
+                  alt="icon"
+                />
+                <p className="font-semibold">{bookingDetails.name}</p>
               </div>
-              <hr className="border-[#F6F5FD]" />
-              <h2 className="font-bold">Bonus Packages For You</h2>
-              <div className="flex justify-between">
-                <div className="flex items-center gap-4">
-                  <img
-                    src="assets/images/icons/coffee.svg"
-                    className="w-[34px] h-[34px]"
-                    alt="icon"
-                  />
-                  <div className="flex flex-col gap-[2px]">
-                    <p className="font-bold">Extra Snacks</p>
-                    <p className="text-sm leading-[21px]">Work-Life Balance</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <img
-                    src="assets/images/icons/group.svg"
-                    className="w-[34px] h-[34px]"
-                    alt="icon"
-                  />
-                  <div className="flex flex-col gap-[2px]">
-                    <p className="font-bold">Free Move</p>
-                    <p className="text-sm leading-[21px]">Anytime 24/7</p>
-                  </div>
-                </div>
-              </div>
-              <hr className="border-[#F6F5FD]" />
-              <a
-                href=""
-                className="flex items-center justify-center w-full rounded-full border border-[#000929] p-[12px_20px] gap-3 bg-white font-semibold"
-              >
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="font-semibold">Phone Number</h3>
+              <div className="flex items-center rounded-full px-5 py-3 gap-[10px] bg-[#F7F7FD]">
                 <img
                   src="assets/images/icons/call-black.svg"
                   className="w-6 h-6"
                   alt="icon"
                 />
-                <span>Call Customer Service</span>
-              </a>
+                <p className="font-semibold">{bookingDetails.phone_number}</p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="font-semibold">Started At</h3>
+              <div className="flex items-center rounded-full px-5 py-3 gap-[10px] bg-[#F7F7FD]">
+                <img
+                  src="assets/images/icons/calendar-black.svg"
+                  className="w-6 h-6"
+                  alt="icon"
+                />
+                <p className="font-semibold">{bookingDetails.started_at}</p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="font-semibold">Ended At</h3>
+              <div className="flex items-center rounded-full px-5 py-3 gap-[10px] bg-[#F7F7FD]">
+                <img
+                  src="assets/images/icons/calendar-black.svg"
+                  className="w-6 h-6"
+                  alt="icon"
+                />
+                <p className="font-semibold">{bookingDetails.ended_at}</p>
+              </div>
             </div>
           </div>
-        )}
-      </section>
-    </>
-  );
-}
+          <hr className="border-[#F6F5FD]" />
+          <div className="flex items-center gap-3">
+            <img
+              src="assets/images/icons/shield-tick.svg"
+              className="w-[30px] h-[30px]"
+              alt="icon"
+            />
+            <p className="font-semibold leading-[28px]">
+              Privasi Anda aman bersama kami.
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-col h-fit shrink-0 rounded-[20px] border border-[#E0DEF7] p-[30px] gap-[30px] bg-white">
+          <h2 className="font-bold">Order Details</h2>
+          <div className="flex flex-col gap-5">
+            {bookingDetails.is_paid ? (
+              <div className="flex items-center justify-between">
+                <p className="font-semibold">Status Pembayaran</p>
+                <p className="rounded-full w-fit p-[6px_16px] bg-[#0D903A] font-bold text-sm leading-[21px] text-[#F7F7FD]">
+                  SUCCESS
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <p className="font-semibold">Status Pembayaran</p>
+                <p className="rounded-full w-fit p-[6px_16px] bg-[#FF852D] font-bold text-sm leading-[21px] text-[#F7F7FD]">
+                  PENDING
+                </p>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between">
+              <p className="font-semibold">Booking TRX ID</p>
+              <p className="font-bold">{bookingDetails.booking_trx_id}</p>
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="font-semibold">Duration</p>
+              <p className="font-bold">
+                {bookingDetails.duration} Days Working
+              </p>
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="font-semibold">Total Amount</p>
+              <p className="font-bold text-[22px] leading-[33px] text-[#0D903A]">
+                Rp {bookingDetails.total_amount.toLocaleString("id")}
+              </p>
+            </div>
+          </div>
+          <hr className="border-[#F6F5FD]" />
+          <h2 className="font-bold">Bonus Packages For You</h2>
+          <div className="flex justify-between">
+            <div className="flex items-center gap-4">
+              <img
+                src="assets/images/icons/coffee.svg"
+                className="w-[34px] h-[34px]"
+                alt="icon"
+              />
+              <div className="flex flex-col gap-[2px]">
+                <p className="font-bold">Extra Snacks</p>
+                <p className="text-sm leading-[21px]">Work-Life Balance</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <img
+                src="assets/images/icons/group.svg"
+                className="w-[34px] h-[34px]"
+                alt="icon"
+              />
+              <div className="flex flex-col gap-[2px]">
+                <p className="font-bold">Free Move</p>
+                <p className="text-sm leading-[21px]">Anytime 24/7</p>
+              </div>
+            </div>
+          </div>
+          <hr className="border-[#F6F5FD]" />
+          <a
+            href=""
+            className="flex items-center justify-center w-full rounded-full border border-[#000929] p-[12px_20px] gap-3 bg-white font-semibold"
+          >
+            <img
+              src="assets/images/icons/call-black.svg"
+              className="w-6 h-6"
+              alt="icon"
+            />
+            <span>Call Customer Service</span>
+          </a>
+        </div>
+      </div>
+    );
+  } else if (error) {
+    return (
+      <div className="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
+        <div className="mx-auto max-w-screen-sm text-center">
+          <p className="mb-4 text-3xl tracking-tight font-bold text-gray-900 md:text-4xl ">
+            Transaction Not Found.
+          </p>
+        </div>
+      </div>
+    );
+  } else if (isLoading) {
+    return <Loading />;
+  } else {
+    return <></>;
+  }
+};
