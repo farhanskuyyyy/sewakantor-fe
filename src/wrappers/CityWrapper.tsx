@@ -6,14 +6,22 @@ import { Link } from "react-router-dom";
 import apiClient from "../services/apiService";
 import Loading from "../components/Loading";
 
-export default function CityWrapper() {
+interface CityWrapperProps {
+  limit: number; // username bersifat opsional dan bisa berupa string atau null
+}
+
+const CityWrapper: React.FC<CityWrapperProps> = ({ limit = 5 }) => {
   const [cities, setCities] = useState<City[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     apiClient
-      .get("/cities")
+      .get("/cities",{
+        params : {
+          limit : limit,
+        }
+      })
       .then((response) => {
         setCities(response.data.data);
         setLoading(false);
@@ -57,4 +65,6 @@ export default function CityWrapper() {
       </div>
     </>
   );
-}
+};
+
+export default CityWrapper;

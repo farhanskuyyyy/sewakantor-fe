@@ -12,7 +12,7 @@ export default function Cities() {
             Our Favorite Cities
           </h2>
         </div>
-        <CityWrapper />
+        <CityWrapper limit={100}/>
       </section>
     </>
   );

@@ -4,15 +4,22 @@ import { Office } from "../types/type";
 import { Link } from "react-router-dom";
 import apiClient from "../services/apiService";
 import Loading from "../components/Loading";
+interface OfficeWrapperProps {
+  limit: number; // username bersifat opsional dan bisa berupa string atau null
+}
 
-export default function OfficeWrapper() {
+const OfficeWrapper: React.FC<OfficeWrapperProps> = ({ limit = 5 }) => {
   const [offices, setOffices] = useState<Office[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     apiClient
-      .get("/offices")
+      .get("/offices", {
+        params: {
+          limit: limit,
+        },
+      })
       .then((response) => {
         setOffices(response.data.data);
         setLoading(false);
@@ -26,7 +33,7 @@ export default function OfficeWrapper() {
   if (error) {
     return <p>Error loading Data : {error}</p>;
   }
-  
+
   return (
     <>
       <section
@@ -52,4 +59,6 @@ export default function OfficeWrapper() {
       </section>
     </>
   );
-}
+};
+
+export default OfficeWrapper;

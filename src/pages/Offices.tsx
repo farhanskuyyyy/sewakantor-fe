@@ -5,7 +5,7 @@ export default function Offices() {
   return (
     <>
       <Navbar />
-      <OfficeWrapper />
+      <OfficeWrapper limit={100} />
     </>
   );
 }

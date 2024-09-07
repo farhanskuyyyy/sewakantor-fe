@@ -135,7 +135,7 @@ export default function Browse() {
             Explore All City
           </a>
         </div>
-        <CityWrapper />
+        <CityWrapper limit={5} />
       </section>
       <section
         id="Benefits"
@@ -250,7 +250,7 @@ export default function Browse() {
           </div>
         </div>
       </section>
-      <OfficeWrapper />
+      <OfficeWrapper limit={3} />
     </>
   );
 }
