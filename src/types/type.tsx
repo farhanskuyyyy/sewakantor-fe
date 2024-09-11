@@ -9,7 +9,11 @@ export interface Office {
   thumbnail: string;
   photos: Photo[];
   benefits: Benefit[];
+  features: Feature[];
+  sales: Sales[];
   about: string;
+  ratings_count : number;
+  ratings_avg : number;
 }
 
 interface Photo {
@@ -20,6 +24,19 @@ interface Photo {
 interface Benefit {
   id: number;
   name: string;
+}
+interface Feature {
+  id: number;
+  name: string;
+  icon: string;
+  description: string;
+}
+interface Sales {
+  id: number;
+  name: string;
+  position: string;
+  phonenumber: string;
+  image: string;
 }
 
 export interface City {

@@ -6,6 +6,7 @@ import { Office } from "../types/type";
 import apiClient from "../services/apiService";
 import ErrorNotFound from "./ErrorNotFound";
 import Loading from "../components/Loading";
+import Rating from "../components/Rating";
 
 export default function OfficeDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -37,15 +38,15 @@ export default function OfficeDetail() {
   }
 
   if (error) {
-    if (error == 'Request failed with status code 404') {
-      return <ErrorNotFound/>;
-    }else{
+    if (error == "Request failed with status code 404") {
+      return <ErrorNotFound />;
+    } else {
       return <p>Error loading Data : {error}</p>;
-    };
+    }
   }
 
   if (!office) {
-    return <ErrorNotFound/>;
+    return <ErrorNotFound />;
   }
   return (
     <>
@@ -108,107 +109,37 @@ export default function OfficeDetail() {
             </div>
             <div className="flex flex-col gap-[6px]">
               <div className="flex items-center gap-1">
-                <img
-                  src="/assets/images/icons/Star 1.svg"
-                  className="w-5 h-5"
-                  alt="star"
-                />
-                <img
-                  src="/assets/images/icons/Star 1.svg"
-                  className="w-5 h-5"
-                  alt="star"
-                />
-                <img
-                  src="/assets/images/icons/Star 1.svg"
-                  className="w-5 h-5"
-                  alt="star"
-                />
-                <img
-                  src="/assets/images/icons/Star 1.svg"
-                  className="w-5 h-5"
-                  alt="star"
-                />
-                <img
-                  src="/assets/images/icons/Star 5.svg"
-                  className="w-5 h-5"
-                  alt="star"
-                />
+                <Rating rate={office.ratings_avg ?? 0} />
               </div>
-              <p className="font-semibold text-right">4.5/5 (19,384)</p>
+              <p className="font-semibold text-right">
+                {office.ratings_avg
+                  ? Math.round(office.ratings_avg * 100) / 100
+                  : 0}
+                /5 ({office.ratings_count ?? 0})
+              </p>
             </div>
           </div>
           <p className="leading-[30px]">{office.about}</p>
           <hr className="border-[#F6F5FD]" />
           <h2 className="font-bold">You Get What You Need Most</h2>
           <div className="grid grid-cols-3 gap-x-5 gap-y-[30px]">
-            <div className="flex items-center gap-4">
-              <img
-                src="/assets/images/icons/security-user.svg"
-                className="w-[34px] h-[34px]"
-                alt="icon"
-              />
-              <div className="flex flex-col gap-[2px]">
-                <p className="font-bold text-lg leading-[24px]">Privacy</p>
-                <p className="text-sm leading-[21px]">For Yourself</p>
+            {office.features.map((feature) => (
+              <div className="flex items-center gap-4">
+                <img
+                  src={`${baseURL}/${feature.icon}`}
+                  className="w-[34px] h-[34px]"
+                  alt="icon"
+                />
+                <div className="flex flex-col gap-[2px]">
+                  <p className="font-bold text-lg leading-[24px]">
+                    {feature.name}
+                  </p>
+                  <p className="text-sm leading-[21px]">
+                    {feature.description}
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <img
-                src="/assets/images/icons/cup.svg"
-                className="w-[34px] h-[34px]"
-                alt="icon"
-              />
-              <div className="flex flex-col gap-[2px]">
-                <p className="font-bold text-lg leading-[24px]">Global Event</p>
-                <p className="text-sm leading-[21px]">Startup Contest</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <img
-                src="/assets/images/icons/home-trend-up.svg"
-                className="w-[34px] h-[34px]"
-                alt="icon"
-              />
-              <div className="flex flex-col gap-[2px]">
-                <p className="font-bold text-lg leading-[24px]">
-                  Sustainbility
-                </p>
-                <p className="text-sm leading-[21px]">Long-term Goals</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <img
-                src="/assets/images/icons/coffee.svg"
-                className="w-[34px] h-[34px]"
-                alt="icon"
-              />
-              <div className="flex flex-col gap-[2px]">
-                <p className="font-bold text-lg leading-[24px]">Extra Snacks</p>
-                <p className="text-sm leading-[21px]">Work-Life Balance</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <img
-                src="/assets/images/icons/3dcube.svg"
-                className="w-[34px] h-[34px]"
-                alt="icon"
-              />
-              <div className="flex flex-col gap-[2px]">
-                <p className="font-bold text-lg leading-[24px]">Compact</p>
-                <p className="text-sm leading-[21px]">Good for Focus</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <img
-                src="/assets/images/icons/group.svg"
-                className="w-[34px] h-[34px]"
-                alt="icon"
-              />
-              <div className="flex flex-col gap-[2px]">
-                <p className="font-bold text-lg leading-[24px]">Free Move</p>
-                <p className="text-sm leading-[21px]">Anytime 24/7</p>
-              </div>
-            </div>
+            ))}
           </div>
           <hr className="border-[#F6F5FD]" />
           <div className="flex flex-col gap-[6px]">
@@ -261,7 +192,8 @@ export default function OfficeDetail() {
             </div>
             <hr className="border-[#F6F5FD]" />
             <div className="flex flex-col gap-[14px]">
-              <Link to={`/office/${office.slug}/book`}
+              <Link
+                to={`/office/${office.slug}/book`}
                 className="flex items-center justify-center w-full rounded-full p-[16px_26px] gap-3 bg-[#0D903A] font-bold text-[#F7F7FD]"
               >
                 <img
@@ -284,68 +216,39 @@ export default function OfficeDetail() {
           <div className="flex flex-col rounded-[20px] border border-[#E0DEF7] p-[30px] gap-[20px] bg-white">
             <h2 className="font-bold">Contact Our Sales</h2>
             <div className="flex flex-col gap-[30px]">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-4">
-                  <div className="w-[60px] h-[60px] rounded-full overflow-hidden">
-                    <img
-                      src="/assets/images/photos/photo-1.png"
-                      className="w-full h-full object-cover"
-                      alt="photo"
-                    />
+              {office.sales.map((seller) => (
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-4">
+                    <div className="w-[60px] h-[60px] rounded-full overflow-hidden">
+                      <img
+                        src={`${baseURL}/${seller.image}`}
+                        className="w-full h-full object-cover"
+                        alt="photo"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-[2px]">
+                      <p className="font-bold">{seller.name}</p>
+                      <p className="text-sm leading-[21px]">{seller.position}</p>
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-[2px]">
-                    <p className="font-bold">Masayoshi</p>
-                    <p className="text-sm leading-[21px]">Sales Manager</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <a href="#">
-                    <img
-                      src="/assets/images/icons/call-green.svg"
-                      className="w-10 h-10"
-                      alt="icon"
-                    />
-                  </a>
-                  <a href="#">
-                    <img
-                      src="/assets/images/icons/chat-green.svg"
-                      className="w-10 h-10"
-                      alt="icon"
-                    />
-                  </a>
-                </div>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-4">
-                  <div className="w-[60px] h-[60px] rounded-full overflow-hidden">
-                    <img
-                      src="/assets/images/photos/photo-2.png"
-                      className="w-full h-full object-cover"
-                      alt="photo"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-[2px]">
-                    <p className="font-bold">Fuji Ovina</p>
-                    <p className="text-sm leading-[21px]">Sales Manager</p>
+                  <div className="flex items-center gap-3">
+                    <a href="#">
+                      <img
+                        src="/assets/images/icons/call-green.svg"
+                        className="w-10 h-10"
+                        alt="icon"
+                      />
+                    </a>
+                    <a href="#">
+                      <img
+                        src="/assets/images/icons/chat-green.svg"
+                        className="w-10 h-10"
+                        alt="icon"
+                      />
+                    </a>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <a href="#">
-                    <img
-                      src="/assets/images/icons/call-green.svg"
-                      className="w-10 h-10"
-                      alt="icon"
-                    />
-                  </a>
-                  <a href="#">
-                    <img
-                      src="/assets/images/icons/chat-green.svg"
-                      className="w-10 h-10"
-                      alt="icon"
-                    />
-                  </a>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>

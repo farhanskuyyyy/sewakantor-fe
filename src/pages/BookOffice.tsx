@@ -75,15 +75,15 @@ export default function BookOffice() {
   }
 
   if (error) {
-    if (error == 'Request failed with status code 404') {
-      return <ErrorNotFound/>;
-    }else{
+    if (error == "Request failed with status code 404") {
+      return <ErrorNotFound />;
+    } else {
       return <p>Error loading Data : {error}</p>;
-    };
+    }
   }
 
   if (!office) {
-    return <ErrorNotFound/>;
+    return <ErrorNotFound />;
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -258,32 +258,23 @@ export default function BookOffice() {
           </div>
           <hr className="border-[#F6F5FD]" />
           <div className="flex flex-col gap-[30px]">
-            <h2 className="font-bold">Bonus Packages For You</h2>
+            <h2 className="font-bold">Features For You</h2>
             <div className="grid grid-cols-2 gap-[30px]">
-              <div className="flex items-center gap-4">
-                <img
-                  src="/assets/images/icons/coffee.svg"
-                  className="w-[34px] h-[34px]"
-                  alt="icon"
-                />
-                <div className="flex flex-col gap-[2px]">
-                  <p className="font-bold text-lg leading-[24px]">
-                    Extra Snacks
-                  </p>
-                  <p className="text-sm leading-[21px]">Work-Life Balance</p>
+              {office.features.slice(0, 2).map((feature) => (
+                <div className="flex items-center gap-4">
+                  <img
+                    src={`${baseURL}/${feature.icon}`}
+                    className="w-[34px] h-[34px]"
+                    alt="icon"
+                  />
+                  <div className="flex flex-col gap-[2px]">
+                    <p className="font-bold text-lg leading-[24px]">
+                      {feature.name}
+                    </p>
+                    <p className="text-sm leading-[21px]">{feature.description}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <img
-                  src="/assets/images/icons/group.svg"
-                  className="w-[34px] h-[34px]"
-                  alt="icon"
-                />
-                <div className="flex flex-col gap-[2px]">
-                  <p className="font-bold text-lg leading-[24px]">Free Move</p>
-                  <p className="text-sm leading-[21px]">Anytime 24/7</p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>

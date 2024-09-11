@@ -22,7 +22,7 @@ const OfficeCard = ({ office }: OfficeCardProps) => {
             </h3>
             <div className="flex items-center justify-between">
               <p className="font-semibold text-xl leading-[30px]">
-                Rp {" "}{office.price.toLocaleString("id")}
+                Rp {office.price.toLocaleString("id")}
               </p>
               <div className="flex items-center justify-end gap-[6px]">
                 <p className="font-semibold">{office.duration} days</p>
@@ -44,7 +44,9 @@ const OfficeCard = ({ office }: OfficeCardProps) => {
                 <p className="font-semibold">{office.city.name}</p>
               </div>
               <div className="flex items-center justify-end gap-[6px]">
-                <p className="font-semibold">4.5/5</p>
+                <p className="font-semibold">
+                  {(office.ratings_avg) ? Math.round(office.ratings_avg*100)/100 : 0}/5
+                </p>
                 <img
                   src="/assets/images/icons/Star 1.svg"
                   className="w-6 h-6"
@@ -54,22 +56,16 @@ const OfficeCard = ({ office }: OfficeCardProps) => {
             </div>
             <hr className="border-[#F6F5FD]" />
             <div className="flex items-center justify-between">
-              <div className="flex items-center justify-end gap-[6px]">
-                <img
-                  src="/assets/images/icons/wifi.svg"
-                  className="w-6 h-6"
-                  alt="icon"
-                />
-                <p className="font-semibold">Fast-Connection</p>
-              </div>
-              <div className="flex items-center justify-end gap-[6px]">
-                <img
-                  src="/assets/images/icons/security-user.svg"
-                  className="w-6 h-6"
-                  alt="icon"
-                />
-                <p className="font-semibold">Secure 100%</p>
-              </div>
+              {office.features.slice(0, 2).map((feature) => (
+                <div className="flex items-center justify-end gap-[6px]">
+                  <img
+                    src={`${baseURL}/${feature.icon}`}
+                    className="w-6 h-6"
+                    alt="icon"
+                  />
+                  <p className="font-semibold">{feature.name}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
