@@ -7,6 +7,11 @@ export const BookingSchema = z.object({
     .string()
     .refine((date) => !isNaN(Date.parse(date)), "Invalid date"),
   office_space_id: z.number().min(1, "Office Space ID is Required"),
+  attachment: z
+    .instanceof(File)
+    .refine((file) => file.type.startsWith("image/"), {
+      message: "Only images are allowed",
+    }),
 });
 
 export const viewBookingSchema = z.object({

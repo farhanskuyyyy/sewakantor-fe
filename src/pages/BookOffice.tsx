@@ -8,6 +8,7 @@ import { BookingSchema } from "../types/validationBooking";
 import apiClient, { isAxiosError } from "../services/apiService";
 import ErrorNotFound from "./ErrorNotFound";
 import Loading from "../components/Loading";
+import PaymentWrapper from "../wrappers/PaymentWrapper";
 
 export default function BookOffice() {
   const { slug } = useParams<{ slug: string }>();
@@ -17,12 +18,22 @@ export default function BookOffice() {
   const baseURL = "http://127.0.0.1:8000/storage";
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
+  interface FormData {
+    name: string;
+    phone_number: string;
+    started_at: string;
+    office_space_id: string;
+    total_amount: number;
+    attachment: File | null;
+  }
+
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     phone_number: "",
     started_at: "",
+    attachment: null,
     office_space_id: "",
-    totalAmountWithUniqueCode: "",
+    total_amount: 0,
   });
 
   const [formErrors, setFormErrors] = useState<z.ZodIssue[]>([]);
@@ -93,6 +104,14 @@ export default function BookOffice() {
     });
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    setFormData((prev) => ({
+      ...prev,
+      attachment: file,
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Validating form data...");
@@ -105,10 +124,26 @@ export default function BookOffice() {
 
     console.log("Form data is valid. Submitting...", formData);
     setIsLoading(true); // Set loading state to true
+    // Create form data object to submit via API
+    const submitFormData = new FormData();
+    submitFormData.append("name", formData.name);
+    submitFormData.append("phone_number", formData.phone_number);
+    submitFormData.append("started_at", formData.started_at);
+    submitFormData.append("office_space_id", formData.office_space_id);
+    submitFormData.append("total_amount", formData.total_amount.toString());
+    if (formData.attachment)
+      submitFormData.append("attachment", formData.attachment);
+
     try {
-      const response = await apiClient.post("/booking-transaction", {
-        ...formData,
-      });
+      const response = await apiClient.post(
+        "/booking-transaction",
+        submitFormData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       console.log("Form submitted successfully:", response.data);
       navigate("/success-booking", {
         state: {
@@ -243,6 +278,30 @@ export default function BookOffice() {
                 error.path.includes("started_at")
               ) && <p className="text-red-500">Started at Is Required</p>}
             </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="attachment" className="font-semibold">
+                Attachment
+              </label>
+              <div className="flex items-center rounded-full border border-[#000929] px-5 gap-[10px] transition-all duration-300 focus-within:ring-2 focus-within:ring-[#0D903A] overflow-hidden">
+                <img
+                  src="/assets/images/icons/calendar-black.svg"
+                  className="w-6 h-6"
+                  alt="icon"
+                />
+                <input
+                  type="file"
+                  name="attachment"
+                  id="attachment"
+                  // value={formData.attachment}
+                  accept="image/*"
+                  className="relative appearance-none outline-none w-full py-3 font-semibold [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:opacity-0"
+                  onChange={handleFileChange}
+                />
+              </div>
+              {formErrors.find((error) =>
+                error.path.includes("attachment")
+              ) && <p className="text-red-500">Attachement Is Required</p>}
+            </div>
           </div>
           <hr className="border-[#F6F5FD]" />
           <div className="flex items-center gap-3">
@@ -261,7 +320,7 @@ export default function BookOffice() {
             <h2 className="font-bold">Features For You</h2>
             <div className="grid grid-cols-2 gap-[30px]">
               {office.features.slice(0, 2).map((feature) => (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4" key={feature.id}>
                   <img
                     src={`${baseURL}/${feature.icon}`}
                     className="w-[34px] h-[34px]"
@@ -271,7 +330,9 @@ export default function BookOffice() {
                     <p className="font-bold text-lg leading-[24px]">
                       {feature.name}
                     </p>
-                    <p className="text-sm leading-[21px]">{feature.description}</p>
+                    <p className="text-sm leading-[21px]">
+                      {feature.description}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -319,48 +380,8 @@ export default function BookOffice() {
           </div>
           <hr className="border-[#F6F5FD]" />
           <h2 className="font-bold">Send Payment to</h2>
-          <div className="flex flex-col gap-[30px]">
-            <div className="flex items-center gap-3">
-              <div className="w-[71px] flex shrink-0">
-                <img
-                  src="/assets/images/logos/bca.svg"
-                  className="w-full object-contain"
-                  alt="bank logo"
-                />
-              </div>
-              <div className="flex flex-col gap-[2px]">
-                <div className="flex items-center gap-1">
-                  <p className="font-semibold">FirstOffice Angga</p>
-                  <img
-                    src="/assets/images/icons/verify.svg"
-                    className="w-[18px] h-[18px]"
-                    alt="icon"
-                  />
-                </div>
-                <p>8008129839</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-[71px] flex shrink-0">
-                <img
-                  src="/assets/images/logos/mandiri.svg"
-                  className="w-full object-contain"
-                  alt="bank logo"
-                />
-              </div>
-              <div className="flex flex-col gap-[2px]">
-                <div className="flex items-center gap-1">
-                  <p className="font-semibold">FirstOffice Angga</p>
-                  <img
-                    src="/assets/images/icons/verify.svg"
-                    className="w-[18px] h-[18px]"
-                    alt="icon"
-                  />
-                </div>
-                <p>12379834983281</p>
-              </div>
-            </div>
-          </div>
+
+          <PaymentWrapper />
           <hr className="border-[#F6F5FD]" />
           <button
             type="submit"

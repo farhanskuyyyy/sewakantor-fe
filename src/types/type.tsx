@@ -60,3 +60,11 @@ export interface BookingDetails {
   ended_at: string;
   office: Office;
 }
+
+export interface Payment {
+  id: number;
+  recipient: string;
+  bank_name: string;
+  bank_number: string;
+  image: string;
+}
