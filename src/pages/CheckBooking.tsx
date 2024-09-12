@@ -2,7 +2,6 @@ import { useState } from "react";
 import Navbar from "../components/Navbar";
 import { BookingDetails } from "../types/type";
 import { z } from "zod";
-import axios from "axios";
 import { viewBookingSchema } from "../types/validationBooking";
 import apiClient, { isAxiosError } from "../services/apiService";
 import Loading from "../components/Loading";
@@ -159,6 +158,7 @@ const ResultBooking: React.FC<ResultProps> = ({
   isLoading,
   error = null,
 }) => {
+  const baseURL = "http://127.0.0.1:8000/storage";
   if (bookingDetails) {
     return (
       <div id="Result" className="grid grid-cols-2 gap-[30px]">
@@ -286,28 +286,21 @@ const ResultBooking: React.FC<ResultProps> = ({
           <hr className="border-[#F6F5FD]" />
           <h2 className="font-bold">Bonus Packages For You</h2>
           <div className="flex justify-between">
-            <div className="flex items-center gap-4">
-              <img
-                src="assets/images/icons/coffee.svg"
-                className="w-[34px] h-[34px]"
-                alt="icon"
-              />
-              <div className="flex flex-col gap-[2px]">
-                <p className="font-bold">Extra Snacks</p>
-                <p className="text-sm leading-[21px]">Work-Life Balance</p>
+            {bookingDetails.office.features.slice(0, 2).map((feature) => (
+              <div className="flex items-center gap-4">
+                <img
+                  src={`${baseURL}/${feature.icon}`}
+                  className="w-[34px] h-[34px]"
+                  alt="icon"
+                />
+                <div className="flex flex-col gap-[2px]">
+                  <p className="font-bold">{feature.name}</p>
+                  <p className="text-sm leading-[21px]">
+                    {feature.description}
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <img
-                src="assets/images/icons/group.svg"
-                className="w-[34px] h-[34px]"
-                alt="icon"
-              />
-              <div className="flex flex-col gap-[2px]">
-                <p className="font-bold">Free Move</p>
-                <p className="text-sm leading-[21px]">Anytime 24/7</p>
-              </div>
-            </div>
+            ))}
           </div>
           <hr className="border-[#F6F5FD]" />
           <a
